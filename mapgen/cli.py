@@ -15,6 +15,7 @@ from PIL import Image
 from . import diagonal
 from . import raster as R
 from .abstract import KINDS, abstract, building_groups
+from .console import configure_utf8_stdio
 from .export import write_all
 from .geo import GEOCODE_ATTRIBUTION, Frame, geocode
 from .sources import gsi, plateau
@@ -25,6 +26,7 @@ SUBPX = 8  # raster pixels per game tile
 
 
 def main(argv=None):
+    configure_utf8_stdio()
     ap = argparse.ArgumentParser(description="地名から地図を取得してピクセルゲームマップに変換する")
     ap.add_argument("place", help="地名・住所・施設名 (例: 新潟県長岡市)")
     ap.add_argument("--source", choices=["plateau", "gsi", "google"], default="plateau",

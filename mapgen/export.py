@@ -76,7 +76,7 @@ def write_all(out, *, kinds, tiles, tileset, source_img, semantic_img, labels, m
              "draworder": "topdown", "objects": objects},
         ],
     }
-    (out / "map.tmj").write_text(json.dumps(tmj, ensure_ascii=False))
+    (out / "map.tmj").write_text(json.dumps(tmj, ensure_ascii=False), encoding="utf-8")
 
     # --- compact game data ---------------------------------------------
     game = {
@@ -85,7 +85,7 @@ def write_all(out, *, kinds, tiles, tileset, source_img, semantic_img, labels, m
         "kindGrid": kinds.ravel().tolist(), "tileGrid": tiles.ravel().tolist(),
         "overlayGrid": overlay.ravel().tolist(), "labels": labels,
     }
-    (out / "map.json").write_text(json.dumps(game, ensure_ascii=False))
+    (out / "map.json").write_text(json.dumps(game, ensure_ascii=False), encoding="utf-8")
 
     # --- full render + viewer ------------------------------------------
     from .tileset import render_map
@@ -93,11 +93,11 @@ def write_all(out, *, kinds, tiles, tileset, source_img, semantic_img, labels, m
     full.save(out / "map.png")
     buf = io.BytesIO()
     tileset.save(buf, "PNG")
-    viewer = (Path(__file__).parent / "viewer.html").read_text()
+    viewer = (Path(__file__).parent / "viewer.html").read_text(encoding="utf-8")
     viewer = viewer.replace("__TITLE__", meta["place"]).replace(
         "/*__MAPDATA__*/null", json.dumps({**game, "kindColors": [KIND_COLORS[k] for k in KINDS]}, ensure_ascii=False)
     ).replace("__TILESET__", "data:image/png;base64," + base64.b64encode(buf.getvalue()).decode())
-    (out / "index.html").write_text(viewer)
+    (out / "index.html").write_text(viewer, encoding="utf-8")
     write_gallery(out.parent)
     return out
 
@@ -111,11 +111,13 @@ def write_gallery(root):
     for d in sorted(Path(root).iterdir(), key=lambda p: -p.stat().st_mtime):
         if not (d / "map.json").exists():
             continue
-        meta = json.loads((d / "map.json").read_text())["meta"]
+        meta = json.loads((d / "map.json").read_text(encoding="utf-8"))["meta"]
         q = quote(d.name)
         items.append(f'<a class="card" href="{q}/index.html"><img src="{q}/abstract.png" alt="">'
                      f'<b>{escape(meta["place"])}</b><small>{escape(meta["source"])} ・ 1マス{meta["tile_m"]}m</small></a>')
-    (Path(root) / "index.html").write_text(GALLERY.replace("__ITEMS__", "\n".join(items)))
+    (Path(root) / "index.html").write_text(
+        GALLERY.replace("__ITEMS__", "\n".join(items)), encoding="utf-8"
+    )
 
 
 GALLERY = """<!doctype html><html lang="ja"><head><meta charset="utf-8">

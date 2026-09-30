@@ -20,6 +20,8 @@ from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import quote
 
+from .console import configure_utf8_stdio
+
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "out"
 JOBS = {}
@@ -37,7 +39,8 @@ def worker():
         cmd = [sys.executable, "-u", "-m", "mapgen", job["place"], "--size", str(job["size"]),
                "--title", job["title"], "--out", str(OUT / job["dir"])]
         try:
-            proc = subprocess.Popen(cmd, cwd=ROOT, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+            proc = subprocess.Popen(cmd, cwd=ROOT, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                                    text=True, encoding="utf-8", errors="replace")
             for line in proc.stdout:
                 job["log"].append(line.rstrip())
             proc.wait(timeout=1800)
@@ -96,6 +99,7 @@ class Handler(SimpleHTTPRequestHandler):
 
 
 def main():
+    configure_utf8_stdio()
     ap = argparse.ArgumentParser()
     ap.add_argument("--port", type=int, default=8891)
     ap.add_argument("--bind", default="127.0.0.1")

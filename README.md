@@ -13,10 +13,31 @@ uv venv .venv && uv pip install --python .venv/bin/python -r requirements.txt
 .venv/bin/python -m mapgen "渋谷駅" --source google       # 要 GOOGLE_MAPS_API_KEY
 ```
 
+### Windows (PowerShell)
+
+```powershell
+uv venv .venv
+uv pip install --python .\.venv\Scripts\python.exe -r requirements.txt
+.\.venv\Scripts\python.exe -m mapgen "新潟県長岡市"                 # 2km四方, 1マス8m -> 250x250
+.\.venv\Scripts\python.exe -m mapgen "長岡駅" --size 1000 --tile-m 5
+.\.venv\Scripts\python.exe -m mapgen "新潟県長岡市" --straighten 6      # より大胆に直線化
+.\.venv\Scripts\python.exe -m mapgen "新潟県長岡市" --layout real       # 実際の形のまま
+.\.venv\Scripts\python.exe -m mapgen "浅草橋" --lat 35.6962 --lon 139.7825 --size 1400 --title "浅草橋・東神田"
+.\.venv\Scripts\python.exe -m mapgen "向ヶ丘遊園駅" --size 1400 --title "向ヶ丘遊園"
+.\.venv\Scripts\python.exe -m mapgen "渋谷駅" --source google       # 要 GOOGLE_MAPS_API_KEY
+```
+
 ## Web UI
 
 ```bash
 .venv/bin/python -m mapgen.server --port 8891     # out/ の配信と生成API
+tailscale serve --bg --https=8446 http://127.0.0.1:8891
+```
+
+Windows (PowerShell) の場合:
+
+```powershell
+.\.venv\Scripts\python.exe -m mapgen.server --port 8891     # out/ の配信と生成API
 tailscale serve --bg --https=8446 http://127.0.0.1:8891
 ```
 一覧ページのフォームに地名を入れると、裏で生成して、終わるとそのマップを開く（`POST /api/generate`、`GET /api/jobs/<id>`）。
